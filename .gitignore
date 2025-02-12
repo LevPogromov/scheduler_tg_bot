@@ -1,0 +1,7 @@
+.venv/
+
+__pycache__/
+
+dump.rdb
+
+config.py
