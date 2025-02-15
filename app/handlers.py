@@ -41,7 +41,7 @@ async def tasks(message: types.Message):
         status = (
             "Завершено" if task.get("status") == "done" else f"Осталось {remaining} ч."
         )
-        msg += f"{task['id']}: {task['text']} ({status})\n"
+        msg += f"{task['_id']}: {task['text']} ({status})\n"
 
     await message.answer(msg)
 
