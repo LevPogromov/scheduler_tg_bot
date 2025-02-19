@@ -32,3 +32,14 @@ def delete_tasks(user_id, date):
     collection.delete_many(
         {"user_id": user_id, "deadline": {"$regex": f"^{date}"}}
     )
+
+def done_task(user_id, task_id):
+    collection.update_one(
+        {"user_id": user_id, "_id": ObjectId(task_id)},
+        {"$set": {"status": "done"}}
+    )
+
+def delete_done_tasks(user_id):
+    collection.delete_many(
+        {"user_id": user_id, "status": "done"}
+    )

@@ -1,47 +1,48 @@
-[project]
+[tool.poetry]
 name = "tg-bot-scheduler"
 version = "0.1.0"
 description = "Telegram Bot for daily schedule"
-authors = [
-    {name = "vadim",email = "144333283+vadyukkha@users.noreply.github.com"}
-]
+authors = ["vadim <144333283+vadyukkha@users.noreply.github.com>"]
 readme = "README.md"
-requires-python = "3.11.11"
-dependencies = [
-    "amqp (==5.3.1)",
-    "anyio (==4.8.0)",
-    "billiard (==4.2.1)",
-    "celery (==5.4.0)",
-    "certifi (==2025.1.31)",
-    "click (==8.1.8)",
-    "click-didyoumean (==0.3.1)",
-    "click-plugins (==1.1.1)",
-    "click-repl (==0.3.0)",
-    "dnspython (==2.7.0)",
-    "h11 (==0.14.0)",
-    "httpcore (==1.0.7)",
-    "httpx (==0.28.1)",
-    "idna (==3.10)",
-    "kombu (==5.4.2)",
-    "prompt-toolkit (==3.0.50)",
-    "pymongo (==4.11.1)",
-    "python-dateutil (==2.9.0.post0)",
-    "python-dotenv (==1.0.1)",
-    "python-telegram-bot (==21.10)",
-    "redis (==5.2.1)",
-    "six (==1.17.0)",
-    "sniffio (==1.3.1)",
-    "typing-extensions (==4.12.2)",
-    "tzdata (==2025.1)",
-    "vine (==5.1.0)",
-    "wcwidth (==0.2.13)",
-    "aiogram (>=3.17.0,<4.0.0)",
-    "black (>=25.1.0,<26.0.0)",
-    "isort (>=6.0.0,<7.0.0)",
-    "flake8 (>=7.1.1,<8.0.0)"
-    
-]
+license = "MIT" # Add a license if applicable
 
+[tool.poetry.dependencies]
+python = ">=3.9"
+amqp = "==5.3.1"
+anyio = "==4.8.0"
+billiard = "==4.2.1"
+celery = "==5.4.0"
+certifi = "==2025.1.31"
+click = "==8.1.8"
+click-didyoumean = "==0.3.1"
+click-plugins = "==1.1.1"
+click-repl = "==0.3.0"
+dnspython = "==2.7.0"
+h11 = "==0.14.0"
+httpcore = "==1.0.7"
+httpx = "==0.28.1"
+idna = "==3.10"
+kombu = "==5.4.2"
+prompt-toolkit = "==3.0.50"
+pymongo = "==4.11.1"
+python-dateutil = "==2.9.0.post0"
+python-dotenv = "==1.0.1"
+python-telegram-bot = "==21.10"
+redis = "==5.2.1"
+pytz = "*"
+six = "==1.17.0"
+sniffio = "==1.3.1"
+typing-extensions = "==4.12.2"
+tzdata = "==2025.1"
+vine = "==5.1.0"
+wcwidth = "==0.2.13"
+aiogram = ">=3.17.0,<4.0.0"
+black = ">=25.1.0,<26.0.0"
+isort = ">=6.0.0,<7.0.0"
+flake8 = ">=7.1.1,<8.0.0"
+
+[tool.poetry.dev-dependencies]
+# Add your development dependencies here (e.g., pytest)
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

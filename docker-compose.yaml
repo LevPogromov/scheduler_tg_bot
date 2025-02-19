@@ -4,6 +4,12 @@ services:
     container_name: mongo_container
     ports:
       - "1234:1234"
+    restart: always
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   app:
     build:
@@ -11,7 +17,8 @@ services:
       dockerfile: Dockerfile
     container_name: tg_bot_container
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DATABASE_URL: "mongodb://db:27017/mydatabase"
     ports:
