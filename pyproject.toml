@@ -4,7 +4,6 @@ version = "0.1.0"
 description = "Telegram Bot for daily schedule"
 authors = ["vadim <144333283+vadyukkha@users.noreply.github.com>"]
 readme = "README.md"
-license = "MIT" # Add a license if applicable
 
 [tool.poetry.dependencies]
 python = ">=3.9"
@@ -40,9 +39,6 @@ aiogram = ">=3.17.0,<4.0.0"
 black = ">=25.1.0,<26.0.0"
 isort = ">=6.0.0,<7.0.0"
 flake8 = ">=7.1.1,<8.0.0"
-
-[tool.poetry.dev-dependencies]
-# Add your development dependencies here (e.g., pytest)
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

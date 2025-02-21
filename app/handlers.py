@@ -42,7 +42,7 @@ async def tasks(message: types.Message):
         return
 
     msg = "Ваши задачи:\n"
-    now_utc = datetime.utcnow()
+    now_utc = datetime.now()
     msk_timezone = pytz.timezone('Europe/Moscow')
     now_msk = now_utc.replace(tzinfo=pytz.utc).astimezone(msk_timezone)
 
@@ -89,12 +89,15 @@ async def delete(message: types.Message):
 
 @router.message(Command("done"))
 async def done(message: types.Message):
-    args = message.text.split()
+    args = message.text.split(maxsplit=2)
     if len(args)< 2:
         await message.answer("Используйте /done task_id")
         return
-    done_task(str(message.from_user.id), args[1])
-    await message.answer(f"Задача {args[1]} выполнена")
+    res = done_task(str(message.from_user.id), args[1])
+    if res.modified_count == 0:
+        await message.answer(f"Задача не выполнена, задача с id {args[1]} не существует")
+    else:
+        await message.answer(f"Задача {args[1]} выполнена")
 
 @router.message(Command("delete_done"))
 async def delete_done(message: types.Message):

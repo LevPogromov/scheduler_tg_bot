@@ -34,10 +34,12 @@ def delete_tasks(user_id, date):
     )
 
 def done_task(user_id, task_id):
-    collection.update_one(
+    res = collection.update_one(
         {"user_id": user_id, "_id": ObjectId(task_id)},
-        {"$set": {"status": "done"}}
+        {"$set": {"status": "done"}},
+        upsert=False    
     )
+    return res
 
 def delete_done_tasks(user_id):
     collection.delete_many(
