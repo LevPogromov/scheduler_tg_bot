@@ -91,8 +91,6 @@ async def edit(message: types.Message):
     else:
         await message.answer("Указанный task_id не существует!")
 
-    await message.answer("Задача обновлена!")
-
 
 @router.message(Command("delete"))
 async def delete(message: types.Message):
