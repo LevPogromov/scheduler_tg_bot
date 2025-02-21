@@ -65,14 +65,19 @@ async def tasks(message: types.Message):
         deadline = datetime.strptime(deadline_str, "%Y-%m-%d %H:%M")
 
         deadline_msk = msk_timezone.localize(deadline)
-        remaining_seconds = (deadline_msk - now_msk).total_seconds()
-        remaining_hours = remaining_seconds // 3600
+        remaining = (deadline_msk - now_msk).total_seconds()
 
-        status = (
-            "Завершено"
-            if task.get("status") == "done"
-            else f"Осталось {remaining_hours: .0f} ч."
-        )
+        hours = int(abs(remaining) // 3600)
+        minutes = int(abs(remaining) // 60 % 60)
+        seconds = int(abs(remaining) % 60)
+
+        status = ""
+        if task["status"] == "done":
+            status = "Выполнено"
+        elif remaining > 0:
+            status = f"Осталось {hours} часов {minutes} минут {seconds} секунд"
+        else:
+            status = f"Просрочено на {hours} часов {minutes} минут {seconds} секунд"
         msg += f"{task['_id']}: {task['text']} ({status})\n"
 
     await message.answer(msg)
