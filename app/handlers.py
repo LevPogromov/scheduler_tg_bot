@@ -86,7 +86,11 @@ async def edit(message: types.Message):
         return
 
     task_id, new_text = args[1], args[2]
-    update_task(str(message.from_user.id), task_id, new_text)
+    if update_task(str(message.from_user.id), task_id, new_text):
+        await message.answer("Задача обновлена!")
+    else:
+        await message.answer("Указанный task_id не существует!")
+
     await message.answer("Задача обновлена!")
 
 
