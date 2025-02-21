@@ -1,9 +1,16 @@
 from datetime import datetime
-import pytz
 
+import pytz
 from aiogram import Router, types
 from aiogram.filters import Command
-from db import add_task, delete_tasks, get_tasks, update_task, done_task, delete_done_tasks
+from db import (
+    add_task,
+    delete_done_tasks,
+    delete_tasks,
+    done_task,
+    get_tasks,
+    update_task,
+)
 
 router = Router()
 
@@ -33,6 +40,7 @@ async def add(message: types.Message):
     task_id = add_task(str(message.from_user.id), text, deadline)
     await message.answer(f"Задача добавлена! ID: {task_id}")
 
+
 @router.message(Command("tasks"))
 async def tasks(message: types.Message):
     user_id = str(message.from_user.id)
@@ -43,7 +51,7 @@ async def tasks(message: types.Message):
 
     msg = "Ваши задачи:\n"
     now_utc = datetime.now()
-    msk_timezone = pytz.timezone('Europe/Moscow')
+    msk_timezone = pytz.timezone("Europe/Moscow")
     now_msk = now_utc.replace(tzinfo=pytz.utc).astimezone(msk_timezone)
 
     for task in user_tasks:
@@ -56,7 +64,9 @@ async def tasks(message: types.Message):
             remaining_hours = remaining_seconds // 3600
 
             status = (
-                "Завершено" if task.get("status") == "done" else f"Осталось {remaining_hours:.0f} ч."
+                "Завершено"
+                if task.get("status") == "done"
+                else f"Осталось {remaining_hours: .0f} ч."
             )
             msg += f"{task['_id']}: {task['text']} ({status})\n"
         except ValueError as e:
@@ -64,6 +74,7 @@ async def tasks(message: types.Message):
             msg += f"Ошибка: Неверный формат даты для задачи {task['_id']}\n"
 
     await message.answer(msg)
+
 
 @router.message(Command("edit"))
 async def edit(message: types.Message):
@@ -87,19 +98,23 @@ async def delete(message: types.Message):
     delete_tasks(str(message.from_user.id), args[1])
     await message.answer(f"Удалены задачи на {args[1]}")
 
+
 @router.message(Command("done"))
 async def done(message: types.Message):
     args = message.text.split(maxsplit=2)
-    if len(args)< 2:
+    if len(args) < 2:
         await message.answer("Используйте /done task_id")
         return
     res = done_task(str(message.from_user.id), args[1])
     if res.modified_count == 0:
-        await message.answer(f"Задача не выполнена, задача с id {args[1]} не существует")
+        await message.answer(
+            f"Задача не выполнена, задача с id {args[1]} не существует"
+        )
     else:
         await message.answer(f"Задача {args[1]} выполнена")
+
 
 @router.message(Command("delete_done"))
 async def delete_done(message: types.Message):
     delete_done_tasks(str(message.from_user.id))
-    await message.answer(f"Удалены выполненные задачи")
+    await message.answer("Удалены выполненные задачи")
