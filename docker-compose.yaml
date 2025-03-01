@@ -3,13 +3,13 @@ services:
     image: mongo:latest
     container_name: mongo_container
     ports:
-      - "1234:1234"
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=chill_admin
+      - MONGO_INITDB_ROOT_PASSWORD=chill_admin_pwd
+    volumes:
+      - ./db_scipts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     restart: always
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   app:
     build:
@@ -17,11 +17,9 @@ services:
       dockerfile: Dockerfile
     container_name: tg_bot_container
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     environment:
-      DATABASE_URL: "mongodb://db:27017/mydatabase"
+      DATABASE_URL: "mongodb://chill_user:chill_user_pwd@db:27017/schedule"
     ports:
       - "8502:8502"
     command: ["sh", "-c", "sleep 10 && poetry run python app/bot.py"]
-  
