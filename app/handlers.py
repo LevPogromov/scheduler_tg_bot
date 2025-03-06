@@ -11,7 +11,6 @@ from db import (
     get_tasks,
     update_task,
 )
-from tasks import set_notification_task
 
 router = Router()
 
@@ -138,33 +137,4 @@ async def delete_done(message: types.Message):
 
 @router.message(Command("set_notification"))
 async def set_notification(message: types.Message):
-    args = message.text.split(maxsplit=1)
-    if len(args) < 2:
-        await message.answer("Используйте: /set_notification text YYYY-MM-DD HH:MM")
-        return
-
-    ans = args[1]
-    parts = ans.rsplit(maxsplit=2)
-    if len(parts) < 3:
-        await message.answer("Используйте: /set_notification text YYYY-MM-DD HH:MM")
-        return
-
-    text, deadline = parts[0], parts[1] + " " + parts[2]
-
-    try:
-        datetime.strptime(deadline, "%Y-%m-%d %H:%M")
-    except ValueError:
-        await message.answer("Неверный формат даты. Используйте: YYYY-MM-DD HH:MM")
-        return
-
-    notification_time = datetime.strptime(deadline, "%Y-%m-%d %H:%M")
-    msk_timezone = pytz.timezone("Europe/Moscow")
-    notification_time_msk = msk_timezone.localize(notification_time)
-    notification_utc = notification_time_msk.astimezone(pytz.utc)
-
-    if (notification_utc - datetime.now(pytz.utc)).total_seconds() <= 0:
-        await message.answer("Указанное время уже прошло.")
-        return
-
-    set_notification_task(str(message.from_user.id), text, notification_utc)
-    await message.answer("Напоминание установлено")
+    pass
