@@ -24,7 +24,7 @@ celery.conf.update(
 
 celery.conf.beat_schedule = {
     "check-expired-tasks": {
-        "task": "tasks.check_expired_tasks",
-        "schedule": timedelta(minutes=15),
+        "task": "tasks.send_info_expired_tasks",
+        "schedule": timedelta(minutes=1),
     },
 }
