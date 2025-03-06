@@ -18,7 +18,7 @@ router = Router()
 @router.message(Command("start"))
 async def start(message: types.Message):
     await message.answer(
-        "Привет! Я бот-планировщик задач. Используйте /add, /tasks, /edit, /delete, /done, /delete_done."
+        "Привет! Я бот-планировщик задач. Используйте /add, /tasks, /edit, /delete, /done, /delete_done, /set_notification."
     )
 
 
@@ -133,3 +133,8 @@ async def done(message: types.Message):
 async def delete_done(message: types.Message):
     delete_done_tasks(str(message.from_user.id))
     await message.answer("Удалены выполненные задачи")
+
+
+@router.message(Command("set_notification"))
+async def set_notification(message: types.Message):
+    pass

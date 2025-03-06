@@ -13,3 +13,4 @@ RUN poetry install --no-root
 COPY app /project/app
 
 CMD ["bash", "-c", "poetry run python app/bot.py"] 
+
