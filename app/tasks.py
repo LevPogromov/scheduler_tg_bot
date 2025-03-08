@@ -3,26 +3,26 @@ from datetime import datetime, timedelta
 
 import pytz
 from aiogram import Bot
-from celery_config import celery
-from config import TOKEN
-from db import collection
+from celery import shared_task
+
+from app.config import TOKEN
+from app.db import collection
 
 bot = Bot(token=TOKEN)
 
 
 def set_notification_task(user_id, text, diff):
-    res = send_notification.apply_async(args=[user_id, text], countdown=60)
-    res.get()
+    send_notification.apply_async(args=[user_id, text], countdown=60)
 
 
-@celery.task
+@shared_task(name="send_notification")
 def send_notification(user_id, text):
     asyncio.run(bot.send_message(chat_id=user_id, text=f"Напоминание: {text}"))
 
 
-@celery.task
+@shared_task(name="send_info_expired_tasks")
 def send_info_expired_tasks():
-    now_utc = datetime.utc(pytz.utc)
+    now_utc = datetime.now()
     msk_timezone = pytz.timezone("Europe/Moscow")
     now_msk = now_utc.replace(tzinfo=pytz.utc).astimezone(msk_timezone)
 
