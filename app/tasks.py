@@ -42,6 +42,6 @@ def send_info_expired_tasks():
         asyncio.run(
             bot.send_message(
                 chat_id=task["user_id"],
-                text=f"Задача просрочена! Новый дедлайн: {new_deadline_str}",
+                text=f"Задача {task['_id']} просрочена! Новый дедлайн: {new_deadline_str}",
             )
         )

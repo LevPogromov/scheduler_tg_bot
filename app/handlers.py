@@ -106,9 +106,12 @@ async def delete(message: types.Message):
         return
 
     try:
-        datetime.strptime(args[1], "%Y-%m-%d %H:%M")
-        delete_tasks(str(message.from_user.id), args[1])
-        await message.answer(f"Удалены задачи на {args[1]}")
+        datetime.strptime(args[1], "%Y-%m-%d")
+        if delete_tasks(str(message.from_user.id), args[1]):
+            await message.answer(f"Удалены задачи на {args[1]}")
+        else:
+            await message.answer("Задач на этот день нет")
+
     except ValueError:
         await message.answer(
             f"Ошибка удаления задач на {args[1]}. Проверьте формат даты."
@@ -132,8 +135,10 @@ async def done(message: types.Message):
 
 @router.message(Command("delete_done"))
 async def delete_done(message: types.Message):
-    delete_done_tasks(str(message.from_user.id))
-    await message.answer("Удалены выполненные задачи")
+    if delete_done_tasks(str(message.from_user.id)):
+        await message.answer("Удалены выполненные задачи")
+    else:
+        await message.answer("Нет выполненных задач")
 
 
 @router.message(Command("set_notification"))

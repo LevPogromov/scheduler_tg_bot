@@ -34,7 +34,10 @@ def update_task(user_id, task_id, new_text):
 
 
 def delete_tasks(user_id, date):
-    collection.delete_many({"user_id": user_id, "deadline": {"$regex": f"^{date}"}})
+    res = collection.delete_many(
+        {"user_id": user_id, "deadline": {"$regex": f"^{date}"}}
+    )
+    return res.deleted_count != 0
 
 
 def done_task(user_id, task_id):
@@ -47,4 +50,5 @@ def done_task(user_id, task_id):
 
 
 def delete_done_tasks(user_id):
-    collection.delete_many({"user_id": user_id, "status": "done"})
+    res = collection.delete_many({"user_id": user_id, "status": "done"})
+    return res.deleted_count != 0
