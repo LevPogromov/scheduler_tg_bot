@@ -12,7 +12,7 @@ bot = Bot(token=TOKEN)
 
 
 def set_notification_task(user_id, text, diff):
-    send_notification.apply_async(args=[user_id, text], countdown=60)
+    send_notification.apply_async(args=[user_id, text], countdown=diff)
 
 
 @shared_task(name="send_notification")
