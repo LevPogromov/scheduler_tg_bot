@@ -11,6 +11,7 @@ from db import (
     get_tasks,
     update_task,
 )
+from tasks import set_notification_task
 
 router = Router()
 
@@ -105,9 +106,12 @@ async def delete(message: types.Message):
         return
 
     try:
-        datetime.strptime(args[1], "%Y-%m-%d %H:%M")
-        delete_tasks(str(message.from_user.id), args[1])
-        await message.answer(f"Удалены задачи на {args[1]}")
+        datetime.strptime(args[1], "%Y-%m-%d")
+        if delete_tasks(str(message.from_user.id), args[1]):
+            await message.answer(f"Удалены задачи на {args[1]}")
+        else:
+            await message.answer("Задач на этот день нет")
+
     except ValueError:
         await message.answer(
             f"Ошибка удаления задач на {args[1]}. Проверьте формат даты."
@@ -131,10 +135,43 @@ async def done(message: types.Message):
 
 @router.message(Command("delete_done"))
 async def delete_done(message: types.Message):
-    delete_done_tasks(str(message.from_user.id))
-    await message.answer("Удалены выполненные задачи")
+    if delete_done_tasks(str(message.from_user.id)):
+        await message.answer("Удалены выполненные задачи")
+    else:
+        await message.answer("Нет выполненных задач")
 
 
 @router.message(Command("set_notification"))
 async def set_notification(message: types.Message):
-    pass
+    args = message.text.split(maxsplit=2)
+    if len(args) < 3:
+        await message.answer("Используйте: /set_notification task_id YYYY-MM-DD HH:MM")
+        return
+
+    task_id, deadline = args[1], args[2]
+    try:
+        deadline = datetime.strptime(deadline, "%Y-%m-%d %H:%M")
+    except ValueError:
+        await message.answer("Неверный формат даты. Используйте: YYYY-MM-DD HH:MM")
+        return
+
+    now_utc = datetime.now()
+    msk_timezone = pytz.timezone("Europe/Moscow")
+    now_msk = now_utc.replace(tzinfo=pytz.utc).astimezone(msk_timezone)
+    deadline_msk = msk_timezone.localize(deadline)
+    delay = (deadline_msk - now_msk).total_seconds()
+
+    if delay < 0:
+        await message.answer("Указанное время уже прошло.")
+        return
+
+    hours = int(delay // 3600)
+    minutes = int(delay // 60 % 60)
+    seconds = int(delay % 60)
+
+    set_notification_task(
+        message.from_user.id, f"Напоминание для задачи {task_id}", int(delay)
+    )
+    await message.answer(
+        f"Напоминание установлено {hours} часов {minutes} минут {seconds} секунд"
+    )
