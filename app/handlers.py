@@ -38,10 +38,18 @@ async def add(message: types.Message):
 
     text, deadline = parts[0], parts[1] + " " + parts[2]
 
+    if len(text) > 100:
+        await message.answer("Длина текста задачи не может быть больше 100")
+        return
+
     try:
         datetime.strptime(deadline, "%Y-%m-%d %H:%M")
     except ValueError:
         await message.answer("Неверный формат даты. Используйте: YYYY-MM-DD HH:MM")
+        return
+
+    if datetime.strptime(deadline, "%Y-%m-%d %H:%M") < datetime.now():
+        await message.answer("Нельзя добавлять задачи в прошлом!")
         return
 
     task_id = add_task(str(message.from_user.id), text, deadline)
@@ -92,6 +100,11 @@ async def edit(message: types.Message):
         return
 
     task_id, new_text = args[1], args[2]
+
+    if len(new_text) > 100:
+        await message.answer("Длина текста задачи не может быть больше 100")
+        return
+
     if update_task(str(message.from_user.id), task_id, new_text):
         await message.answer("Задача обновлена!")
     else:

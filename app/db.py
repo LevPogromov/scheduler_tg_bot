@@ -20,7 +20,7 @@ def add_task(user_id, text, deadline):
 
 
 def get_tasks(user_id):
-    tasks = list(collection.find({"user_id": user_id}))
+    tasks = list(collection.find({"user_id": user_id}).sort("deadline", 1))
     for task in tasks:
         task["_id"] = str(task["_id"])
     return tasks
@@ -34,9 +34,7 @@ def update_task(user_id, task_id, new_text):
 
 
 def delete_tasks(user_id, date):
-    res = collection.delete_many(
-        {"user_id": user_id, "deadline": {"$regex": f"^{date}"}}
-    )
+    res = collection.delete_many({"user_id": user_id, "deadline": date})
     return res.deleted_count != 0
 
 
