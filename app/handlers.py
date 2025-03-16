@@ -34,7 +34,7 @@ async def add(message: types.Message):
 
     ans = args[1]
     parts = ans.rsplit(maxsplit=3)
-    if len(parts) < 3:
+    if len(parts) < 4:
         await message.answer(
             "Используйте: /add text importance YYYY-MM-DD HH:MM где importance 1 - низкая важность, 2 - средняя, 3 - высокая"
         )
@@ -46,10 +46,6 @@ async def add(message: types.Message):
         datetime.strptime(deadline, "%Y-%m-%d %H:%M")
     except ValueError:
         await message.answer("Неверный формат даты. Используйте: YYYY-MM-DD HH:MM")
-        return
-
-    if datetime.strptime(deadline, "%Y-%m-%d %H:%M") < datetime.now():
-        await message.answer("Нельзя добавлять задачи в прошлом!")
         return
 
     if importance.isdigit():
@@ -71,7 +67,11 @@ async def add(message: types.Message):
     deadline_msk = msk_timezone.localize(deadline_msk)
     remaining = (deadline_msk - now_msk).total_seconds() // 3600
 
-    if remaining <= 0:
+    if deadline_msk < now_msk:
+        await message.answer("Нельзя добавлять задачи в прошлом!")
+        return
+
+    if remaining == 0:
         priority = 3
     else:
         priority = int(importance) * (1 / remaining)

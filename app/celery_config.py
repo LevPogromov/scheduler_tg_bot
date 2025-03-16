@@ -26,7 +26,7 @@ celery_app.conf.update(
 celery_app.conf.beat_schedule = {
     "check-expired-tasks": {
         "task": "send_info_expired_tasks",
-        "schedule": timedelta(minutes=10),
+        "schedule": timedelta(minutes=1),
     },
     "check-priority": {
         "task": "check_priority",
