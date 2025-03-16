@@ -28,4 +28,8 @@ celery_app.conf.beat_schedule = {
         "task": "send_info_expired_tasks",
         "schedule": timedelta(minutes=1),
     },
+    "check-priority": {
+        "task": "check_priority",
+        "schedule": timedelta(hours=1),
+    },
 }

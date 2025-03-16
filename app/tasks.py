@@ -39,13 +39,25 @@ def send_info_expired_tasks():
 
     async def async_send_info_expired_tasks():
         bot = get_bot()
+        msk_timezone = pytz.timezone("Europe/Moscow")
         for task in overdue_tasks:
+            now_utc = datetime.now()
+            now_msk = now_utc.replace(tzinfo=pytz.utc).astimezone(msk_timezone)
             task_deadline = datetime.strptime(task["deadline"], "%Y-%m-%d %H:%M")
             new_deadline = task_deadline + timedelta(days=1)
+            deadline_msk = msk_timezone.localize(new_deadline)
+            remaining = (deadline_msk - now_msk).total_seconds() // 3600
+
+            if remaining <= 0:
+                priority = 3
+            else:
+                priority = int(task["importance"]) * (1 / remaining)
+
             new_deadline_str = new_deadline.strftime("%Y-%m-%d %H:%M")
 
             collection.update_one(
-                {"_id": task["_id"]}, {"$set": {"deadline": new_deadline_str}}
+                {"_id": task["_id"]},
+                {"$set": {"deadline": new_deadline_str, "priority": priority}},
             )
 
             await bot.send_message(
@@ -55,3 +67,27 @@ def send_info_expired_tasks():
         await bot.session.close()
 
     asyncio.run(async_send_info_expired_tasks())
+
+
+@shared_task(name="check_priority")
+def check_priority():
+    all_users = collection.distinct("user_id")
+    now_utc = datetime.utcnow()
+    msk_timezone = pytz.timezone("Europe/Moscow")
+    now_msk = now_utc.replace(tzinfo=pytz.utc).astimezone(msk_timezone)
+    for user_id in all_users:
+        tasks = list(collection.find({"user_id": user_id}))
+        for task in tasks:
+            deadline_str = task["deadline"]
+            deadline = datetime.strptime(deadline_str, "%Y-%m-%d %H:%M")
+            deadline_msk = msk_timezone.localize(deadline)
+            remaining = (deadline_msk - now_msk).total_seconds() // 3600
+            importance = task["importance"]
+            if remaining <= 0:
+                priority = 3
+            else:
+                priority = int(importance) * (1 / remaining)
+
+            collection.update_one(
+                {"_id": task["_id"]}, {"$set": {"priority": priority}}
+            )

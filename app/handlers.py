@@ -27,20 +27,20 @@ async def start(message: types.Message):
 async def add(message: types.Message):
     args = message.text.split(maxsplit=1)
     if len(args) < 2:
-        await message.answer("Используйте: /add text YYYY-MM-DD HH:MM")
+        await message.answer(
+            "Используйте: /add text importance YYYY-MM-DD HH:MM где importance 1 - низкая важность, 2 - средняя, 3 - высокая"
+        )
         return
 
     ans = args[1]
-    parts = ans.rsplit(maxsplit=2)
+    parts = ans.rsplit(maxsplit=3)
     if len(parts) < 3:
-        await message.answer("Используйте: /add text YYYY-MM-DD HH:MM")
+        await message.answer(
+            "Используйте: /add text importance YYYY-MM-DD HH:MM где importance 1 - низкая важность, 2 - средняя, 3 - высокая"
+        )
         return
 
-    text, deadline = parts[0], parts[1] + " " + parts[2]
-
-    if len(text) > 100:
-        await message.answer("Длина текста задачи не может быть больше 100")
-        return
+    text, deadline, importance = parts[0], parts[2] + " " + parts[3], parts[1]
 
     try:
         datetime.strptime(deadline, "%Y-%m-%d %H:%M")
@@ -52,7 +52,35 @@ async def add(message: types.Message):
         await message.answer("Нельзя добавлять задачи в прошлом!")
         return
 
-    task_id = add_task(str(message.from_user.id), text, deadline)
+    if importance.isdigit():
+        if int(importance) < 1 or int(importance) > 3:
+            await message.answer(
+                "Используйте: /add text importance YYYY-MM-DD HH:MM где importance 1 - низкая важность, 2 - средняя, 3 - высокая"
+            )
+            return
+    else:
+        await message.answer(
+            "Используйте: /add text importance YYYY-MM-DD HH:MM где importance 1 - низкая важность, 2 - средняя, 3 - высокая"
+        )
+        return
+
+    now_utc = datetime.now()
+    msk_timezone = pytz.timezone("Europe/Moscow")
+    now_msk = now_utc.replace(tzinfo=pytz.utc).astimezone(msk_timezone)
+    deadline_msk = datetime.strptime(deadline, "%Y-%m-%d %H:%M")
+    deadline_msk = msk_timezone.localize(deadline_msk)
+    remaining = (deadline_msk - now_msk).total_seconds() // 3600
+
+    if remaining <= 0:
+        priority = 3
+    else:
+        priority = int(importance) * (1 / remaining)
+
+    if len(text) > 100:
+        await message.answer("Длина текста задачи не может быть больше 100")
+        return
+
+    task_id = add_task(str(message.from_user.id), text, deadline, importance, priority)
     await message.answer(f"Задача добавлена! ID: {task_id}")
 
 
