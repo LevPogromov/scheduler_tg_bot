@@ -8,10 +8,12 @@ db = client[NAME_OF_DATABASE]
 collection = db[NAME_OF_COLLECTION]
 
 
-def add_task(user_id, text, deadline):
+def add_task(user_id, text, deadline, importance, priority):
     task = {
         "user_id": user_id,
         "text": text,
+        "importance": importance,
+        "priority": priority,
         "deadline": deadline,
         "status": "pending",
     }
@@ -20,7 +22,7 @@ def add_task(user_id, text, deadline):
 
 
 def get_tasks(user_id):
-    tasks = list(collection.find({"user_id": user_id}))
+    tasks = list(collection.find({"user_id": user_id}).sort("priority", -1))
     for task in tasks:
         task["_id"] = str(task["_id"])
     return tasks

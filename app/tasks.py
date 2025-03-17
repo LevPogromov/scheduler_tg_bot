@@ -43,15 +43,40 @@ def send_info_expired_tasks():
             task_deadline = datetime.strptime(task["deadline"], "%Y-%m-%d %H:%M")
             new_deadline = task_deadline + timedelta(days=1)
             new_deadline_str = new_deadline.strftime("%Y-%m-%d %H:%M")
-
+            priority = 3
             collection.update_one(
-                {"_id": task["_id"]}, {"$set": {"deadline": new_deadline_str}}
+                {"_id": task["_id"]},
+                {"$set": {"deadline": new_deadline_str, "priority": priority}},
             )
 
             await bot.send_message(
                 chat_id=task["user_id"],
-                text=f"Задача '{task['_id']}' просрочена. Дедлайн перенесен на 1 день.",
+                text=f"Задача '{task['_id']}' просрочена. Дедлайн перенесен на 1 день. Выставлен максимальный приоритет.",
             )
         await bot.session.close()
 
     asyncio.run(async_send_info_expired_tasks())
+
+
+@shared_task(name="check_priority")
+def check_priority():
+    all_users = collection.distinct("user_id")
+    now_utc = datetime.now()
+    msk_timezone = pytz.timezone("Europe/Moscow")
+    now_msk = now_utc.replace(tzinfo=pytz.utc).astimezone(msk_timezone)
+    for user_id in all_users:
+        tasks = list(collection.find({"user_id": user_id}))
+        for task in tasks:
+            deadline_str = task["deadline"]
+            deadline = datetime.strptime(deadline_str, "%Y-%m-%d %H:%M")
+            deadline_msk = msk_timezone.localize(deadline)
+            remaining = (deadline_msk - now_msk).total_seconds() // 3600
+            importance = task["importance"]
+            if remaining <= 0:
+                priority = 3
+            else:
+                priority = int(importance) * (1 / remaining)
+
+            collection.update_one(
+                {"_id": task["_id"]}, {"$set": {"priority": priority}}
+            )
