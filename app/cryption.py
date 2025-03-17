@@ -46,7 +46,7 @@ else:
 
 def encrypt_text(text: str) -> Binary:
     encrypted = client_encryption.encrypt(
-        text, algorithm="AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic", key_id=key_id
+        text, algorithm="AEAD_AES_256_CBC_HMAC_SHA_512-Random", key_id=key_id
     )
     return Binary(encrypted, subtype=6)
 
