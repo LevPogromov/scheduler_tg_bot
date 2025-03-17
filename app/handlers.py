@@ -212,7 +212,7 @@ async def set_notification(message: types.Message):
     seconds = int(delay % 60)
 
     set_notification_task(
-        message.from_user.id, f"Напоминание для задачи {task_id}", int(delay)
+        message.from_user.id, f"Напоминание для задачи {task_id}!", int(delay)
     )
     await message.answer(
         f"Напоминание установлено {hours} часов {minutes} минут {seconds} секунд"

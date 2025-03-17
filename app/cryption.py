@@ -1,9 +1,9 @@
-import os
+import base64
 
 from bson.binary import Binary
 from bson.codec_options import CodecOptions
 from config import (
-    MASTER_KEY_PATH,
+    MASTER_KEY,
     NAME_OF_COLLECTION_CRYPTO,
     NAME_OF_DATABASE_CRYPTO,
     URI_CRYPTO,
@@ -12,22 +12,15 @@ from pymongo import MongoClient
 from pymongo.encryption import ClientEncryption
 
 
-def load_or_generate_master_key():
-    if os.path.exists(MASTER_KEY_PATH):
-        with open(MASTER_KEY_PATH, "rb") as f:
-            return f.read()
-    else:
-        key = os.urandom(96)
-        with open(MASTER_KEY_PATH, "wb") as f:
-            f.write(key)
-        return key
+def load_master_key():
+    return base64.b64decode(MASTER_KEY)
 
 
 client_shifr = MongoClient(URI_CRYPTO)
 key_vault_db = client_shifr[NAME_OF_DATABASE_CRYPTO]
 key_vault_collection = key_vault_db[NAME_OF_COLLECTION_CRYPTO]
 
-local_master_key = load_or_generate_master_key()
+local_master_key = load_master_key()
 kms_providers = {"local": {"key": local_master_key}}
 
 client_encryption = ClientEncryption(
