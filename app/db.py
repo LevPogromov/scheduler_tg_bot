@@ -36,7 +36,9 @@ def update_task(user_id, task_id, new_text):
 
 
 def delete_tasks(user_id, date):
-    res = collection.delete_many({"user_id": user_id, "deadline": date})
+    res = collection.delete_many(
+        {"user_id": user_id, "deadline": {"$regex": f"^{date}"}}
+    )
     return res.deleted_count != 0
 
 
