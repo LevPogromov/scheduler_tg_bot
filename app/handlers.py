@@ -13,6 +13,8 @@ from db import (
 )
 from tasks import set_notification_task
 
+from app.cryption import decrypt_text, encrypt_text
+
 router = Router()
 
 
@@ -76,9 +78,7 @@ async def add(message: types.Message):
     else:
         priority = int(importance) * (1 / remaining)
 
-    if len(text) > 100:
-        await message.answer("Длина текста задачи не может быть больше 100")
-        return
+    text = encrypt_text(text)
 
     task_id = add_task(str(message.from_user.id), text, deadline, importance, priority)
     await message.answer(f"Задача добавлена! ID: {task_id}")
@@ -115,7 +115,10 @@ async def tasks(message: types.Message):
             status = f"Осталось {hours} часов {minutes} минут {seconds} секунд"
         else:
             status = f"Просрочено на {hours} часов {minutes} минут {seconds} секунд"
-        msg += f"{task['_id']}: {task['text']} ({status})\n"
+
+        text = decrypt_text(task["text"])
+
+        msg += f"{task['_id']}: {text} ({status})\n"
 
     await message.answer(msg)
 
@@ -129,9 +132,7 @@ async def edit(message: types.Message):
 
     task_id, new_text = args[1], args[2]
 
-    if len(new_text) > 100:
-        await message.answer("Длина текста задачи не может быть больше 100")
-        return
+    new_text = encrypt_text(new_text)
 
     if update_task(str(message.from_user.id), task_id, new_text):
         await message.answer("Задача обновлена!")
