@@ -23,7 +23,7 @@ httpx = "==0.28.1"
 idna = "==3.10"
 kombu = "==5.4.2"
 prompt-toolkit = "==3.0.50"
-pymongo = "==4.11.1"
+pymongo = {extras = ["encryption"], version = "^4.11.2"}
 python-dateutil = "==2.9.0.post0"
 python-dotenv = "==1.0.1"
 python-telegram-bot = "==21.10"
@@ -39,6 +39,7 @@ aiogram = ">=3.17.0,<4.0.0"
 black = ">=25.1.0,<26.0.0"
 isort = ">=6.0.0,<7.0.0"
 flake8 = ">=7.1.1,<8.0.0"
+pymongocrypt = "^1.12.2"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
