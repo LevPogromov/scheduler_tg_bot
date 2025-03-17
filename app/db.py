@@ -48,7 +48,7 @@ def done_task(user_id, task_id):
         {"$set": {"status": "done"}},
         upsert=False,
     )
-    return res
+    return res.modified_count != 0
 
 
 def delete_done_tasks(user_id):

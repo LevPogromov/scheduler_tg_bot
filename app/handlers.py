@@ -166,13 +166,13 @@ async def done(message: types.Message):
     if len(args) < 2:
         await message.answer("Используйте /done task_id")
         return
-    res = done_task(str(message.from_user.id), args[1])
-    if res.modified_count == 0:
+
+    if done_task(str(message.from_user.id), args[1]):
+        await message.answer(f"Задача {args[1]} выполнена")
+    else:
         await message.answer(
             f"Задача не выполнена, задача с id {args[1]} не существует"
         )
-    else:
-        await message.answer(f"Задача {args[1]} выполнена")
 
 
 @router.message(Command("delete_done"))
