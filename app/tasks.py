@@ -34,7 +34,10 @@ def send_info_expired_tasks():
     now_msk = now_utc.replace(tzinfo=pytz.utc).astimezone(msk_timezone)
 
     overdue_tasks = collection.find(
-        {"deadline": {"$lt": now_msk.strftime("%Y-%m-%d %H:%M")}, "status": "pending"}
+        {
+            "deadline": {"$lt": now_msk.strftime("%Y-%m-%d %H:%M")},
+            "status": {"$in": ["pending", "prolonged"]},
+        }
     )
 
     async def async_send_info_expired_tasks():
