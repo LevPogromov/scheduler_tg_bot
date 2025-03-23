@@ -1,11 +1,12 @@
 from bson.objectid import ObjectId
-from pymongo import MongoClient
+from pymongo import ASCENDING, MongoClient
 
 from app.config import NAME_OF_COLLECTION, NAME_OF_DATABASE, URI
 
 client = MongoClient(URI)
 db = client[NAME_OF_DATABASE]
 collection = db[NAME_OF_COLLECTION]
+collection.create_index([("user_id", ASCENDING)])
 
 
 def add_task(user_id, text, deadline, importance, priority):
@@ -45,7 +46,7 @@ def delete_tasks(user_id, date):
 def done_task(user_id, task_id):
     res = collection.update_one(
         {"user_id": user_id, "_id": ObjectId(task_id)},
-        {"$set": {"status": "done"}},
+        {"$set": {"status": "done", "priority": 0}},
         upsert=False,
     )
     return res.modified_count != 0
