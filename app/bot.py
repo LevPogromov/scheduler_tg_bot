@@ -2,10 +2,10 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from config import TOKEN
 from handlers import router
 
 from app.celery_config import celery_app as celery_app
+from app.config import TOKEN
 
 logging.basicConfig(level=logging.INFO)
 
